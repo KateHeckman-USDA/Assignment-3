@@ -82,7 +82,21 @@ food_env_5_states <- food_env_full %>% filter(State %in% c("VA",
                                                         "OH"))
 
 #B.8
+food_env_5_states %>% group_by(State) %>% summarize(minimumPOV = min(CHILDPOVRATE15),
+                                                    maximumPOV = max(CHILDPOVRATE15),
+                                                    meanPOV = mean(CHILDPOVRATE15),
+                                                    medianPOV = median(CHILDPOVRATE15),
+                                                    standard_deviationPOV = sd(CHILDPOVRATE15),
+                                                    minimumACC = min(PCT_LACCESS_HHNV15),
+                                                    maximumACC = max(PCT_LACCESS_HHNV15),
+                                                    meanACC = mean(PCT_LACCESS_HHNV15),
+                                                    medianACC = median(PCT_LACCESS_HHNV15),
+                                                    standard_deviationACC = sd(PCT_LACCESS_HHNV15))
 
+#B.9
+ggplot(food_env_5_states, aes(CHILDPOVRATE15)) + geom_density()
+ggplot(food_env_5_states, aes(PCT_LACCESS_HHNV15)) + geom_density()
+print("Poverty rate is normally distributed while access is right skewed")
 ```
 
 
@@ -91,6 +105,25 @@ food_env_5_states <- food_env_full %>% filter(State %in% c("VA",
 10. Using `food_env_full`, compute the interquartile range of the `PCT_LACCESS_HHNV15` column to identify outliers. Remove rows with outliers from the data then create a new boxplot with the filtered dataframe. How does this boxplot compare to the one you created in question 6?
 11. Make a scatterplot with `PCT_LACCESS_HHNV15` (outliers removed) on the x-axis and `CHILDPOVRATE15` on the y-axis. Add a straight line that shows the linear relationship between the two variables to your plot.
 12. Compute the correlation between `PCT_LACCESS_HHNV15` and `CHILDPOVRATE15`. Do you think the relationship is strong? Are there other factors that could affect both the child poverty rate and a household's access to a grocery store in a county?
+
+```{r, echo=FALSE}
+#C.10
+summary(food_env_full$PCT_LACCESS_HHNV15)
+OutliersRemoved <- food_env_full %>% filter(PCT_LACCESS_HHNV15>=1.687 & PCT_LACCESS_HHNV15<=4.026)
+boxplot(OutliersRemoved$PCT_LACCESS_HHNV15)
+print("The data is no longer skewed in comparison to the boxplot created in question 6.")
+
+#C.11
+ggplot(OutliersRemoved, aes(PCT_LACCESS_HHNV15, CHILDPOVRATE15)) + 
+  geom_point()+ 
+  geom_smooth(method=lm)
+
+#C.12
+linearModel <- lm(CHILDPOVRATE15~PCT_LACCESS_HHNV15, OutliersRemoved)
+summary(linearModel)
+print("The relationship is significant but not strong.")
+print("Parental education level and ethnic classification are likely better predictors of child poverty rate.")
+```
 
 **Bonus:** Create a report in R Markdown or Dash using at least one of the plots you made, a table showing summary statistics for either `CHILDPOVRATE15` or `PCT_LACCESS_HHNV15`, and text explaining your analysis.
 
