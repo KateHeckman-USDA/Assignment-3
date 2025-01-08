@@ -5,6 +5,7 @@ output: word_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
 ```
 
 **Data:** USDA-ERS data on food environment factors (a subset of the Food Environment Atlas), along with county-level food security data from Feeding America. This assignment uses the variables listed below.
@@ -31,6 +32,23 @@ For reference, a full list of the variables in this dataset is included at the e
 3.  Create a new dataframe named `food_env_full` that excludes rows with any missing data. How many rows were dropped?
 4.  Convert the `METRO13` column to data type "logical."
 
+```{r, echo=FALSE}
+#A.1
+food_env <- read.csv("EDA_assignment_dataset.csv")
+
+#A.2
+summary(food_env)
+
+#A.3
+food_env_full <- drop_na(food_env)
+droppedRows <- as.numeric(nrow(food_env) - nrow(food_env_full))
+print(paste("The number of dropped rows is", droppedRows))
+
+#A.4
+food_env_full$METRO13 <- as.logical(food_env_full$METRO13)
+print(paste("The data type of METRO13 is", typeof(food_env_full$METRO13)))
+``` 
+
 *Part B: Explore the data*
 
 5.  What are the minimum, maximum, mean, median, and standard deviation of `CHILDPOVRATE15`? Plot a histogram of child poverty rates to view the distribution.
@@ -38,6 +56,35 @@ For reference, a full list of the variables in this dataset is included at the e
 7.  Filter `food_env_full` to just counties in Virginia, Illinois, Michigan, Arkansas, and Ohio and save the smaller dataset as `food_env_5_states`.
 8.  What are the minimum, maximum, mean, median, and standard deviation values of `CHILDPOVRATE15` and `PCT_LACCESS_HHNV15` in each state?
 9.  Create faceted histograms or density plots of `CHILDPOVRATE15` and `PCT_LACCESS_HHNV15` by state. What do you notice about the distributions?
+```{r, echo=FALSE}
+#B.5
+summary_stats <- function(data) {
+  print(paste("Minimum:", min(data)))
+  print(paste("Maximum:", max(data)))
+  print(paste("Mean:", mean(data)))
+  print(paste("Median:", median(data)))
+  print(paste("Standard Deviation:", sd(data)))
+}
+print("Child poverty rate statistics")
+print(summary_stats(food_env_full$CHILDPOVRATE15))
+
+hist(food_env_full$CHILDPOVRATE15)
+
+#B.6
+ggplot(food_env_full, aes(x=PCT_LACCESS_HHNV15)) + geom_density()
+boxplot(food_env_full$PCT_LACCESS_HHNV15)
+
+#B.7
+food_env_5_states <- food_env_full %>% filter(State %in% c("VA",
+                                                        "IL",
+                                                        "MI",
+                                                        "AR",
+                                                        "OH"))
+
+#B.8
+
+```
+
 
 *Part C: Preliminary analysis*
 
